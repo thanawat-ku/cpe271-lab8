@@ -1,37 +1,17 @@
 #include <WiFiManager.h> // https://github.com/tzapu/WiFiManager
-#include <PubSubClient.h>
+#include <HTTPClient.h>
+#include <Arduino_JSON.h>
 
-WiFiClient espClient;
-PubSubClient client(espClient);
-long lastMsg = 0;
-
-const char *mqtt_server = "YOUR_MQTT_BROKER_IP_ADDRESS";
+HTTPClient http;
 
 void setup()
 {
-    WiFi.mode(WIFI_STA); // explicitly set mode, esp defaults to STA+AP
-    // it is a good practice to make sure your code sets wifi mode how you want it.
-
-    // put your setup code here, to run once:
+    WiFi.mode(WIFI_STA);
     Serial.begin(115200);
-
-    // WiFiManager, Local intialization. Once its business is done, there is no need to keep it around
     WiFiManager wm;
 
-    // reset settings - wipe stored credentials for testing
-    // these are stored by the esp library
-    // wm.resetSettings();
-
-    // Automatically connect using saved credentials,
-    // if connection fails, it starts an access point with the specified name ( "AutoConnectAP"),
-    // if empty will auto generate SSID, if password is blank it will be anonymous AP (wm.autoConnect())
-    // then goes into a blocking loop awaiting configuration and will return success result
-
     bool res;
-    // res = wm.autoConnect(); // auto generated AP name from chipid
-    // res = wm.autoConnect("AutoConnectAP"); // anonymous ap
-    res = wm.autoConnect("AutoConnectAP", "password"); // password protected ap
-
+    res = wm.autoConnect("AutoConnectAP", "password");
     if (!res)
     {
         Serial.println("Failed to connect");
@@ -42,43 +22,100 @@ void setup()
         // if you get here you have connected to the WiFi
         Serial.println("connected...yeey :)");
     }
-    client.setServer(mqtt_server, 1883);
+    printMenu();
 }
-void reconnect()
+void printMenu()
 {
-    // Loop until we're reconnected
-    while (!client.connected())
-    {
-        Serial.print("Attempting MQTT connection...");
-        // Attempt to connect
-        if (client.connect("ESP8266Client"))
-        {
-            Serial.println("connected");
-        }
-        else
-        {
-            Serial.print("failed, rc=");
-            Serial.print(client.state());
-            Serial.println(" try again in 5 seconds");
-            // Wait 5 seconds before retrying
-            delay(5000);
-        }
-    }
+    Serial.println("Method");
+    Serial.println("1. GET");
+    Serial.println("2. POST");
+    Serial.println("3. PUT");
+    Serial.println("4. DELETE");
+    Serial.println("Select Method:");
+}
+
+String httpGetRequest()
+{
+    String payload = "{}";
+    http.begin("http://your-server-ip/api/resource/123");
+    int httpResponseCode = http.GET();
+    payload = http.getString();
+    // Free resources
+    http.end();
+    return payload;
+}
+
+String httpPostRequest(String postData)
+{
+    String payload = "{}";
+        http.begin("http://your-server-ip/api/resource");
+        http.addHeader("Content-Type", "application/json");
+        int httpResponseCode = http.POST(httpRequestData);
+        payload = http.getString();
+    // Free resources
+    http.end();
+    return payload;
+}
+
+String httpPutRequest(String putData)
+{
+    String payload = "{}";
+    http.begin("http://your-server-ip/api/resource/123"); // Specify resource URL
+    http.addHeader("Content-Type", "application/json");
+    int httpResponseCode = http.PUT(putData); // Send PUT request
+    payload = http.getString();
+    // Free resources
+    http.end();
+    return payload;
+}
+
+String httpDeleteRequest()
+{
+    String payload = "{}";
+    http.begin("http://your-server-ip/api/resource/123"); // Specify resource URL
+    int httpResponseCode = http.sendRequest("DELETE");    // Send DELETE request
+    payload = http.getString();
+    // Free resources
+    http.end();
+    return payload;
 }
 
 void loop()
 {
-    if (!client.connected())
+    if (WiFi.status() == WL_CONNECTED)
     {
-        reconnect();
+        if (Serial.available())
+        {
+            char choice = Serial.read();
+            switch (choice)
+            {
+            case "1":
+                String returnString = httpGetRequest();
+                Serial.print("Get Return:");
+                Serial.println(returnString);
+                break;
+            case "2":
+                String returnString = httpPostRequest("{\"id\"=\"123\",\"name\"=\"fookies\",\"email\"=\"fookies@hotmail.com\"}");
+                Serial.print("Post Return:");
+                Serial.println(returnString);
+                break;
+            case "3":
+                String returnString = httpPutRequest("{\"name\"=\"thanawat\",\"email\"=\"thanawat@ku.th\"}");
+                Serial.print("Put Return:");
+                Serial.println(returnString);
+                break;
+            case "4":
+                String returnString = httpDeleteRequest();
+                Serial.print("Delete Return:");
+                Serial.println(returnString);
+                break;
+            }
+        }
     }
-    client.loop();
-
-    // put your main code here, to run repeatedly:
-    long now = millis();
-    if (now - lastMsg > 5000)
+    else
     {
-        lastMsg = now;
-        client.publish("esp32/msg", tempString);
+        Serial.println("Reconnecting to WiFi...");
+        WiFi.disconnect();
+        WiFi.reconnect();
     }
 }
