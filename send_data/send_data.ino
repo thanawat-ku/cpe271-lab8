@@ -50,7 +50,7 @@ String httpPostRequest(String postData)
     String payload = "{}";
         http.begin("http://your-server-ip/api/resource");
         http.addHeader("Content-Type", "application/json");
-        int httpResponseCode = http.POST(httpRequestData);
+        int httpResponseCode = http.POST(postData);
         payload = http.getString();
     // Free resources
     http.end();
@@ -89,22 +89,22 @@ void loop()
             char choice = Serial.read();
             switch (choice)
             {
-            case "1":
+            case '1':
                 String returnString = httpGetRequest();
                 Serial.print("Get Return:");
                 Serial.println(returnString);
                 break;
-            case "2":
+            case '2':
                 String returnString = httpPostRequest("{\"id\"=\"123\",\"name\"=\"fookies\",\"email\"=\"fookies@hotmail.com\"}");
                 Serial.print("Post Return:");
                 Serial.println(returnString);
                 break;
-            case "3":
+            case '3':
                 String returnString = httpPutRequest("{\"name\"=\"thanawat\",\"email\"=\"thanawat@ku.th\"}");
                 Serial.print("Put Return:");
                 Serial.println(returnString);
                 break;
-            case "4":
+            case '4':
                 String returnString = httpDeleteRequest();
                 Serial.print("Delete Return:");
                 Serial.println(returnString);
