@@ -5,9 +5,9 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 long lastMsg = 0;
 // LED Pin
-const int ledPin = 4;
+const int ledPin = 2;
 
-const char *mqtt_server = "YOUR_MQTT_BROKER_IP_ADDRESS";
+const char *mqtt_server = "mqtt-dashboard.com";
 
 void setup()
 {
@@ -51,7 +51,7 @@ void setup()
 
 void callback(char *topic, byte *message, unsigned int length)
 {
-    if (String(topic) == "esp32-xxxx/output")
+    if (String(topic) == "esp32-1111/output")
     {
         Serial.print("Changing output to ");
         if (messageTemp == "on")
@@ -103,6 +103,6 @@ void loop()
     if (now - lastMsg > 5000)
     {
         lastMsg = now;
-        client.publish("esp32-xxxx/msg", tempString);
+        client.publish("esp32-1111/msg", tempString);
     }
 }
