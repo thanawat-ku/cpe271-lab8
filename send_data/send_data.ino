@@ -87,25 +87,26 @@ void loop()
         if (Serial.available())
         {
             char choice = Serial.read();
+            String returnString="";
             switch (choice)
             {
             case '1':
-                String returnString = httpGetRequest();
+                returnString = httpGetRequest();
                 Serial.print("Get Return:");
                 Serial.println(returnString);
                 break;
             case '2':
-                String returnString = httpPostRequest("{\"id\"=\"123\",\"name\"=\"fookies\",\"email\"=\"fookies@hotmail.com\"}");
+                returnString = httpPostRequest("{\"id\"=\"123\",\"name\"=\"fookies\",\"email\"=\"fookies@hotmail.com\"}");
                 Serial.print("Post Return:");
                 Serial.println(returnString);
                 break;
             case '3':
-                String returnString = httpPutRequest("{\"name\"=\"thanawat\",\"email\"=\"thanawat@ku.th\"}");
+                returnString = httpPutRequest("{\"name\"=\"thanawat\",\"email\"=\"thanawat@ku.th\"}");
                 Serial.print("Put Return:");
                 Serial.println(returnString);
                 break;
             case '4':
-                String returnString = httpDeleteRequest();
+                returnString = httpDeleteRequest();
                 Serial.print("Delete Return:");
                 Serial.println(returnString);
                 break;
