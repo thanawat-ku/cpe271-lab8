@@ -77,7 +77,7 @@ void reconnect()
         if (client.connect("ESP8266Client"))
         {
             Serial.println("connected");
-            client.subscribe("esp32-xxxx/output");
+            client.subscribe("esp32-1111/output");
         }
         else
         {
