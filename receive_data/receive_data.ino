@@ -91,6 +91,6 @@ void loop() {
   long now = millis();
   if (now - lastMsg > 5000) {
     lastMsg = now;
-    client.publish("esp32-1111/msg", tempString);
+    client.publish("esp32-1111/msg", String(now));
   }
 }
