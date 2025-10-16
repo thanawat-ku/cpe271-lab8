@@ -86,11 +86,4 @@ void loop() {
     reconnect();
   }
   client.loop();
-
-  // put your main code here, to run repeatedly:
-  long now = millis();
-  if (now - lastMsg > 5000) {
-    lastMsg = now;
-    client.publish("esp32-1111/msg", String(now));
-  }
 }
